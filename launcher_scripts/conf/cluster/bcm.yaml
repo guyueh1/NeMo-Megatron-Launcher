@@ -1,9 +1,9 @@
-partition: luna
-account: devtech
+partition: interactive
+account: joc
 exclusive: true
 gpus_per_task: null
 gpus_per_node: null
 mem: 0
-job_name_prefix: 'devtech-gpt:'
+job_name_prefix: 'joc-nemo_llama:tuning_debug'
 srun_args:
   - --no-container-mount-home

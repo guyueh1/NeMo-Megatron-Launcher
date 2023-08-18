@@ -15,20 +15,20 @@ trainer:
   precision: bf16
   logger: False
   enable_checkpointing: False
-  replace_sampler_ddp: False
+  use_distributed_sampler: False
   max_epochs: 4
   max_steps: -1
   log_every_n_steps: 10
   val_check_interval: 200
   accumulate_grad_batches: 1
   gradient_clip_val: 1.0
-  resume_from_checkpoint: null # The path to a checkpoint file to continue the training, restores the whole state including the epoch, step, LR schedulers, apex, etc.
+  # resume_from_checkpoint: null # The path to a checkpoint file to continue the training, restores the whole state including the epoch, step, LR schedulers, apex, etc.
 
 exp_manager:
   explicit_log_dir: ${prompt_learning.run.results_dir}/results
   exp_dir: null
   name: megatron_llama_prompt
-  create_wandb_logger: True
+  create_wandb_logger: False
   wandb_logger_kwargs:
     project: nemo_llama_prompt
     name: ${prompt_learning.run.name}
@@ -45,15 +45,16 @@ exp_manager:
     save_best_model: True
 
 model:
+  megatron_amp_O2: true
   seed: 1234
   nemo_path: ${prompt_learning.run.results_dir}/results/megatron_gpt_prompt.nemo # the place to save prompt learning nemo checkpoint
   virtual_prompt_style: 'p-tuning' # One of 'p-tuning', 'prompt-tuning', or 'inference'. We recommend 'p-tuning' over 'prompt-tuning'.
-  tensor_model_parallel_size: 2
+  tensor_model_parallel_size: 1
   pipeline_model_parallel_size: 1
   model_parallel_size: ${multiply:${.tensor_model_parallel_size}, ${.pipeline_model_parallel_size}}
   encoder_seq_length: 2048
   global_batch_size: 64
-  micro_batch_size: 8
+  micro_batch_size: 1
 
   restore_path: null # used to restore from a prompt tuned checkpoint and add new tasks
   language_model_path: ${prompt_learning.run.convert_dir}/results/megatron_llama.nemo # Restore lanugage model from pre-trained .nemo checkpoint
