@@ -14,12 +14,18 @@ SAVE_NEMO=${9:-False}
 TRAIN_STEPS=21
 GLOBAL_BATCH_SIZE=128
 
+CLUSTER_ACCOUNT=coreai_dlalgo_llm
+CLUSTER_PARTITION=luna
 
 python3 main.py \
   stages=[peft] \
   container=nvcr.io/nvidian/bignlp-train:23.08-nemofw-nightly \
   container_mounts=[${NEMO}:/opt/NeMo] \
   launcher_scripts_path=${NML}/launcher_scripts \
+  cluster.partition=${CLUSTER_PARTITION} \
+  cluster.account=${CLUSTER_ACCOUNT} \
+  cluster.gpus_per_node=null \
+  cluster.job_name_prefix=${CLUSTER_ACCOUNT}- \
   peft=llama/squad \
   peft.model.restore_from_path=${NML}/launcher_scripts/data/llama2/${MODEL} \
   peft.run.model_train_name=${MODEL} \
